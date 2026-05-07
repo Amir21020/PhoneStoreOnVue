@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, provide, computed } from 'vue'
+import { ref, watch, provide, computed, onMounted } from 'vue'
 import Header from './components/Header.vue'
 import Drawer from './components/Drawer.vue'
 
@@ -23,10 +23,19 @@ const addToCart = (item) => {
 }
 
 const removeFromCart = (item) => {
-  cart.value.splice(cart.value.indexOf(item), 1)
+  const index = cart.value.findIndex(cartItem => cartItem.id === item.id)
+  if (index !== -1) {
+    cart.value.splice(index, 1)
+  }
   item.isAdded = false
 }
 
+onMounted(() => {
+  const localCart = localStorage.getItem('cart')
+  if (localCart) {
+    cart.value = JSON.parse(localCart)
+  }
+})
 
 watch(
   cart,

@@ -4,12 +4,13 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import CardList from '@/components/CardList.vue';
 
+const API_URL = 'https://9ac066f574a736c2.mokky.dev'
 
 const favorites = ref([])
 
 onMounted(async () => {
   try{
-    const {data} = await axios.get(`https://9ac066f574a736c2.mokky.dev/favorites?_relations=items`)
+    const {data} = await axios.get(`${API_URL}/favorites?_relations=items`)
     favorites.value = data.map((obj) => obj.item)
 
   }catch(err){

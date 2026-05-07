@@ -5,11 +5,12 @@ import DrawerHead from './DrawerHead.vue';
 import InfoBlock from './InfoBlock.vue';
 import axios from 'axios';
 
+const API_URL = 'https://9ac066f574a736c2.mokky.dev'
+
 const props = defineProps({
   totalPrice: Number,
   vatPrice: Number
 })
-
 
 
 const { cart } = inject('cart')
@@ -19,17 +20,23 @@ const isCreating = ref(false)
 const createOrder = async () => {
   try{
       isCreating.value = true
-      const {data} = axios.post(`https://9ac066f574a736c2.mokky.dev/orders`, {
+      const { data } = await axios.post(`${API_URL}/orders`, {
       items: cart.value,
       totalPrice: props.totalPrice,
     })
 
-    cart.value = []
-
     console.log(data)
 
-    return data
+    cart.value = []
   }
+  catch(err){
+    console.log(err)
+  }
+  finally {
+    isCreating.value = false
+  }
+
+}
   catch(err){
     console.log(err)
   }

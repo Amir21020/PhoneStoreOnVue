@@ -3,6 +3,8 @@ import CardList from '@/components/CardList.vue';
 import { inject, reactive,watch, ref, onMounted } from 'vue';
 import axios from 'axios'
 
+const API_URL = 'https://9ac066f574a736c2.mokky.dev'
+
 const items = ref([])
 const {addToCart, removeFromCart, cart} = inject('cart')
 
@@ -31,7 +33,7 @@ const filters = reactive({
 
 const fetchFavorites = async () => {
   try {
-    const { data: favorites } = await axios.get(`https://9ac066f574a736c2.mokky.dev/favorites`)
+    const { data: favorites } = await axios.get(`${API_URL}/favorites`)
 
     items.value = items.value.map((item) => {
       const favorite = favorites.find((favorite) => favorite.item_id === item.id)
@@ -60,7 +62,7 @@ const fetchItems = async () => {
       params.title = `*${filters.searchQuery}*`
     }
 
-    const { data } = await axios.get(`https://9ac066f574a736c2.mokky.dev/items`, {
+    const { data } = await axios.get(`${API_URL}/items`, {
       params,
     })
     items.value = data.map((obj) => ({
@@ -75,9 +77,6 @@ const fetchItems = async () => {
 }
 
 onMounted(async () => {
-  const localCart = localStorage.getItem('cart')
-  cart.value = localCart ? JSON.parse(localCart) : []
-
   await fetchItems()
   await fetchFavorites()
 
@@ -99,12 +98,12 @@ const addToFavorite = async (item) => {
 
       item.isFavorite = true
 
-      const { data } = await axios.post(`https://9ac066f574a736c2.mokky.dev/favorites`, obj)
+      const { data } = await axios.post(`${API_URL}/favorites`, obj)
 
       item.favoriteId = data.id
     } else {
       item.isFavorite = false
-      await axios.delete(`https://9ac066f574a736c2.mokky.dev/favorites/${item.favoriteId}`)
+      await axios.delete(`${API_URL}/favorites/${item.favoriteId}`)
       item.favoriteId = null
     }
   } catch (err) {
@@ -113,12 +112,7 @@ const addToFavorite = async (item) => {
 }
 
 watch(filters, fetchItems)
-watch(cart, () => {
-  items.value = items.value.map((item) => ({
-    ...item,
-    isAdded: false,
-  }))
-})
+// isAdded now managed via addToCart/removeFromCart
 
 </script>
 
